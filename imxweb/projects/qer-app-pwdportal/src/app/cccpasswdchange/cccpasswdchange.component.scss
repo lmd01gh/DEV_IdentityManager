@@ -92,3 +92,84 @@ color: primary;
 .boton{
   margin-right: 50px;
 }
+
+.pin-header {
+  font-family: 'Source Sans Pro', sans-serif; /* Tipo de letra Arial */
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.masked-info {
+  font-family: 'Source Sans Pro', sans-serif; /* Tipo de letra Arial */
+  font-style: italic;
+  color: #555;
+  margin-left: 20px;
+}
+
+.custom-letra-grande {
+  font-family: 'Source Sans Pro', sans-serif; /* Tipo de letra Arial */
+  font-size: 16px; /* Tamaño de letra */
+ // font-weight: 400; /* Peso de la letra */
+ // width: 100%; /* Ancho del campo de entrada */
+ // max-width: 600px; /* Ancho máximo del campo de entrada */
+}
+
+.custom-letra {
+  font-family: 'Source Sans Pro', sans-serif; /* Tipo de letra Arial */
+  font-size: 14px; /* Tamaño de letra */
+  font-weight: 400; /* Peso de la letra */
+}
+
+.label-with-border {
+  border-left: 5px solid red; /* Borde izquierdo rojo */
+  border-right: 2px solid #ada6a6; /* Color del borde */
+  border-bottom: 2px solid #ada6a6; /* Color del borde */
+  border-top: 2px solid #ada6a6; /* Color del borde */;
+  padding: 5px; /* Espacio interno */
+  display: inline-block; /* Para que el borde se ajuste al contenido */
+ // font-weight: bold; /* Negrita */
+}
+
+.pin-container {
+  border: 2px solid #ccc; /* Color del borde */
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 10px; /* Espacio interno */
+  margin-top: 0px; /* Espacio superior */
+  //background-color: #f9f9f9; /* Color de fondo */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra */
+ // display: inline-block; /* Para que el borde se ajuste al contenido */
+ width: 20%;
+}
+
+.captcha-container {
+  border: 2px solid #ccc; /* Color del borde */
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 15px; /* Espacio interno */
+  margin-top: 10px; /* Espacio superior */
+  //background-color: #f9f9f9; /* Color de fondo */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra */
+ // display: inline-block; /* Para que el borde se ajuste al contenido */
+ width: 20%;
+}
+
+.captcha-button {
+  margin-left: 0px; /* Ajusta el valor según sea necesario */
+}
+.rounded-input {
+  border-radius: 8px; /* Bordes redondeados */
+  border: 1px solid #ccc; /* Color del borde */
+  padding: 4px; /* Espacio interno */
+  width: 20%; /* Ancho completo */
+   display: inline-block; /* Para que el borde se ajuste al contenido */
+  //box-sizing: border-box; /* Incluye el padding y el borde en el ancho total */
+}
+.icon-text-container {
+  display: flex;
+  align-items: center;
+}
+
+.mat-icon {
+  margin-right: 8px; /* Ajusta el espacio entre el icono y el texto */
+}

@@ -9,15 +9,18 @@
  
   </h1>
 
-
+  <eui-alert *ngIf="errorLogin" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="LimpiarErrorLogin()">
+    <span translate>Por favor, contacte nuestro centro de atención al usuario.</span>
+</eui-alert>
 
   <eui-alert *ngIf="errorCaptcha" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="Anterior()">
       <span translate>Código captcha incorrecto.</span>
   </eui-alert>
     
   <eui-alert *ngIf="errorPascode"[condensed]="true" [colored]="true" type="error"  [dismissable]="true" (dismissed)="Anterior()" >
-    <span translate>ERROR: El Pin de acceso introducido no es válido. </span>
+    <span translate>Pin de acceso introducido no válido. </span>
   </eui-alert>
+
   <eui-alert *ngIf="errorPasswd"[condensed]="true" [colored]="true" type="error"  [dismissable]="true" (dismissed)="LimpiarErrorPaswd()" >
     <span translate>Las contraseñas no coinciden</span>
   </eui-alert>
@@ -30,17 +33,18 @@
     <div>
     
       <mat-stepper linear #stepper >
-        <!--<mat-step  [stepControl]="firstFormGroup"  [editable]="!errorSolicitud && !alertPin" clas="mat-step-header">-->
+        
+        <!--PRIMER PASO-->
         <mat-step [stepControl]="firstFormGroup"  class="mat-step-header">
 
           <ng-template matStepLabel>Seleccione e introduzca nombre de usuario</ng-template>
             <ng-container>
               <div>
                 <mat-radio-group  class="imx-type-radiogroup" color="primary"  [(ngModel)]="ConPinTemporal" data-imx-identifier="ConPinTemporal" (change)="ModificaOpcionSeleccionada()">
-                  <mat-radio-button [value]="false" data-imx-identifier="ConPinTemporal-false" >
+                  <mat-radio-button [value]="false" data-imx-identifier="ConPinTemporal-false" class="custom-letra">
                   Solicitar pin temporal de recuperación de contraseña
                   </mat-radio-button>
-                  <mat-radio-button [value]="true" data-imx-identifier="ConPinTemporal-true">
+                  <mat-radio-button [value]="true" data-imx-identifier="ConPinTemporal-true" class="custom-letra">
                     He recibido un pin temporal para el cambio de contraseña
                   </mat-radio-button>
                 </mat-radio-group>
@@ -49,19 +53,19 @@
               <form [formGroup]="firstFormGroup" >  
                 <mat-form-field>
                   <mat-label>Usuario</mat-label>
-                    <input matInput  formControlName="firstCtrl" data-imx-identifier="Login" placeholder="Login"  [(ngModel)]="Login" required>
+                    <input matInput  class= "custom-letra" formControlName="firstCtrl" data-imx-identifier="Login" placeholder="Login"  [(ngModel)]="Login" required>
                 </mat-form-field>
               </form>
             </ng-container>
-        
-        
-        <!--<div *ngIf="ConPinTemporal">hola</div>-->
-
-             <div>
-                <button mat-stroked-button *ngIf="firstFormGroup" matStepperNext color="primary">Siguiente</button>
+  
+            <!--Llamo a VerDatosR si estoy solicitando pin y el campo login está relleno-->
+            <div>
+                <button mat-stroked-button *ngIf="firstFormGroup" matStepperNext color="primary" (click)="ConPinTemporal === false && Login ? VerDatosR() : null" class="boton">Siguiente</button>
               </div>
  
         </mat-step>
+
+        <!--segundo paso-->
 
         <!--<mat-step  [stepControl]="secondFormGroup">-->
           <mat-step class="mat-step-header">
@@ -69,51 +73,74 @@
               <input class="form-control-lg border-0" [(ngModel)]="Login">
             </ng-template>
 
-        <!--No tiene Pin Temporal -->
+            <!--No tiene Pin Temporal -->
         
             <div *ngIf="!ConPinTemporal">
-              <div> Indique la dirección de correo o el móvil configurados en su perfil para recuperación de contraseña. </div>
-              <div> Le recordamos que debe haber cumplimentado los datos correspondientes en su perfil de usuario. </div>
-              <br>
-            <mat-form-field  [style.width.px]=350>
-                <mat-label>Recibir PIN en:</mat-label>
-                  <input matInput  data-imx-identifier="Pin" [(ngModel)]="Pin" >
-            </mat-form-field> 
+              <div *ngIf="maskedEmail || maskedPhoneMobile">
+                <p class="pin-header">Recibir PIN en:</p>
+                <div *ngIf="maskedEmail">
+                  <p class="masked-info">Correo electrónico: {{ maskedEmail }}</p>
+                </div>
+                <div *ngIf="maskedPhoneMobile">
+                  <p class="masked-info">Teléfono móvil: {{ maskedPhoneMobile }}</p>
+                </div>
+                <br>
+                <mat-form-field [style.width.px]=350>
+                  <input matInput data-imx-identifier="Pin" class ="custom-letra" [(ngModel)]="Pin" #pinInput>
+                </mat-form-field>
+              </div>
+             
             </div>
-        
       
         <!--Tiene Pin Temporal -->
-            <div  *ngIf="ConPinTemporal">
+            <!--<div  *ngIf="ConPinTemporal">
               <mat-form-field>
-                <mat-label>Pin de acceso:</mat-label>
+                <mat-label class="custom-letra">Pin de acceso:</mat-label>
                   <input matInput [(ngModel)]="PinAcceso" type="password" (input)="Anterior()">
                 </mat-form-field> 
+            </div>-->
+        
+             <!--Tiene Pin Temporal -->
+          <div *ngIf="ConPinTemporal">
+            <div class="icon-text-container">
+              <mat-icon>vpn_key</mat-icon>
+              <p class="custom-letra">&nbsp;&nbsp;Introduzca el PIN de acceso recibido:&nbsp;     
+              <!--<mat-form-field [style.width.px]=350>
+                <mat-label>Introduzca el pin de acceso recibido:</mat-label>
+                
+              </mat-form-field> -->
+              <input  class="rounded-input" [(ngModel)]="PinAcceso" type="password" (input)="Anterior()"></p>
             </div>
+          </div>
         
-            <div  *ngIf="ConPinTemporal">
-              <div class="captcha-container">
-                <div>
-                  <form [formGroup]="secondFormGroup" > 
-                  <!--Evento que se ejecuta cuando pierde el foco (blur)="VerificarCaptcha()""-->
-                      <input  placeholder="Introduzca los caracteres" formControlName="secondCtrl" type="text"
-                      [(ngModel)]="captchaSvc.Response" [attr.data-imx-identifier]="'captcha-code'" [required]="true" (input)="Anterior()"> 
-                  </form>
-                  <imx-captcha></imx-captcha>
-                  <button mat-raised-button (click)="ReinciciarCaptcha()">{{'#LDS#Refresh image' | translate}}</button>	 
+          <div *ngIf="ConPinTemporal">
+            <div class="captcha-container">
+              <div>
+                <form [formGroup]="secondFormGroup"> 
+                  <p class="custom-letra">Introduzca el código de seguridad que aparece en la imagen para verificar su identidad:</p>
+                  <input class="rounded-input" formControlName="secondCtrl" type="text" [(ngModel)]="captchaSvc.Response" [attr.data-imx-identifier]="'captcha-code'" [required]="true" (input)="Anterior()"> &nbsp;
+                  <button class="captcha-button" mat-raised-button class="captcha-button" (click)="ReinciciarCaptcha()">
+                    <mat-icon >cached</mat-icon>
+                  </button>	 
+                </form>
+                <p><imx-captcha></imx-captcha></p>
+                
+                <div *ngIf="captchaCorrecto" class="label-with-check">
+                  Captcha correcto
+                  <span class="check-icon">✔️</span>
                 </div>
-              </div>    
-              <br>
-              <br>
-        
-             </div> 
+              </div>
+            </div>    
+            <br>
+            <br>
+          </div> 
+
 
             <div>
               <!--Solicito un pin Temporal-->
               <div *ngIf="!ConPinTemporal"> 
-                  <!--<button mat-raised-button   matStepperPrevious  *ngIf="!alertPin && !errorSolicitud" (click)="onCodigoErrorDismissed()"  color="primary">Anterior</button>-->
-                  <!--<button mat-raised-button   *ngIf="!alertPin && !errorSolicitud" color="primary" (click)="EnviarPin()">Enviar Pin</button>-->
-                  <button mat-stroked-button color="primary" class="boton" matStepperPrevious     color="primary">Anterior</button>
-                  <button mat-stroked-button class="boton" color="primary" (click)="EnviarPin()">Enviar Pin</button>
+                  <button mat-stroked-button class="boton" color="primary" matStepperPrevious  *ngIf="maskedEmail || maskedPhoneMobile || errorLogin" (click)="LimpiarErrorLogin()"   color="primary">Anterior</button>
+                  <button mat-stroked-button class="boton" color="primary" (click)="EnviarPin()" *ngIf="maskedEmail || maskedPhoneMobile">Enviar Pin</button>
                 </div>
           
             <!--Tiene Pin Temporal -->

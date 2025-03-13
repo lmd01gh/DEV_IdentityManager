@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild} from '@angular/core';
+import { Component, OnInit,ViewChild, ElementRef,AfterViewInit} from '@angular/core';
 import {  SplashService  } from 'qbm';
 import { CaptchaService, AppConfigService } from 'qbm';
 
@@ -7,7 +7,7 @@ import {  UntypedFormGroup, UntypedFormControl } from '@angular/forms';
 import {FormBuilder, Validators} from '@angular/forms';
 import { OverlayRef } from '@angular/cdk/overlay';
 
-import { V2Client} from 'imx-api-ccc';
+import { V2Client } from 'imx-api-ccc';
 import { MatStepper } from '@angular/material/stepper';
 import {cccvisorrequisitosComponent} from "./cccvisorrequisitos.component";
 import {cccvisorpasswdokComponent} from "./cccvisorpasswd-ok.component";
@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PolicyValidationResult } from 'imx-api-qer';
 
 import { PasswordService } from '../../../../qer/src/lib/password/password.service';
+import { throwDialogContentAlreadyAttachedError } from '@angular/cdk/dialog';
 
 
 
@@ -31,11 +32,13 @@ export class CccpasswdchangeComponent implements OnInit {
   public readonly profileForm: UntypedFormGroup;
   public readonly formGroup: UntypedFormGroup;
   public  _v3Client: V2Client;
+  public _vClient: V2Client;
   public showPageContent = true;
   public isLoggedIn = false;
   
   
    @ViewChild('stepper') public stepper: MatStepper;
+   @ViewChild('pinInput') pinInput: ElementRef;
   
 
   firstFormGroup = this._formBuilder.group({
@@ -69,6 +72,10 @@ export class CccpasswdchangeComponent implements OnInit {
   errorPasswd=false;
   errorCheckPasswd=false;
   errorCaptcha=false;
+  errorLogin=false;
+  maskedString: string = '';
+public maskedEmail: string;
+public maskedPhoneMobile: string;
    
   
 
@@ -100,11 +107,16 @@ export class CccpasswdchangeComponent implements OnInit {
    
   const schemaProvider = this.config.client;
   this._v3Client = new V2Client(this.config.apiClient,schemaProvider);
+  this._vClient = new V2Client(this.config.apiClient,schemaProvider);
+ 
   
   this.splash.close();
   
   }
  
+  ngAfterViewInit(): void {
+    this.setFocusOnPin();
+  }
 
 
 
@@ -115,7 +127,8 @@ public async EnviarPin() {
  setTimeout(() => overlayRef = this.busyService.show()); 
  const LoginTemp=this.Login;
  //console.log(LoginTemp);
- let respuesta2= await this._v3Client.Customeprinsa_ccc_SolicitudOTP_get({OTP_Usuario:this.Login ,OTP_EnviarA:this.Pin})
+ 
+ let respuesta2= await this._v3Client.customeprinsa_ccc_SolicitudOTP_get({OTP_Usuario:this.Login ,OTP_EnviarA:this.Pin})
  if (respuesta2 == "-1") 
   {
     //Error no me envia el pin por error en los datos. Llamo a la pantalla modal para mostrar error
@@ -140,11 +153,8 @@ public async EnviarPin() {
     setTimeout(() => this.busyService.hide(overlayRef));
     this.ConPinTemporal=true;
     }
-
+    
 }
-
-
-
 
   
   async VerificarAcceso()
@@ -154,7 +164,7 @@ public async EnviarPin() {
       let overlayRef: OverlayRef;
       setTimeout(() => overlayRef = this.busyService.show());
       const resp = this.captchaSvc.Response;
-      var resp1= await this._v3Client.Customeprinsa_ccc_CompruebaCaptcha_get({Codigo:resp})
+      var resp1= await this._v3Client.customeprinsa_ccc_CompruebaCaptcha_get({Codigo:resp})
       if (resp1 == "0" )
       {
         //captcha incorrecto
@@ -220,7 +230,7 @@ public async EnviarPin() {
         }
       else{
         //Las claves son iguales. Obtenemos la longitud minima de la password que debe cumplir por política
-        const resp4=await this._v3Client.Customeprinsa_ccc_PoliticaPassword_columnas_get({})  
+        const resp4=await this._v3Client.customeprinsa_ccc_PoliticaPassword_columnas_get({})  
         const Longitud=(resp4.Entities[0].Columns.MinLen.Value);
         if ((this.NuevaPasswd.length)< Longitud) 
           {
@@ -289,6 +299,11 @@ public LimpiarErrorPaswd():void
   this.errorCheckPasswd=false;
 }
 
+public LimpiarErrorLogin():void
+{
+  this.errorLogin=false;
+  this.stepper.reset();
+}
 
 public Anterior():void {
   this.errorPascode=false;
@@ -306,7 +321,7 @@ async RequisitosPasswd()
   let overlayRef: OverlayRef;
   setTimeout(() => overlayRef = this.busyService.show());
   try{
-  const resp3=await this._v3Client.Customeprinsa_ccc_PoliticaPassword_columnas_get({})  
+  const resp3=await this._v3Client.customeprinsa_ccc_PoliticaPassword_columnas_get({})  
   this.dialogService.open(cccvisorrequisitosComponent, {
         data: {Title: resp3.Entities[0].Columns.DisplayName.Value,
         HistoryLen: resp3.Entities[0].Columns.HistoryLen.Value,
@@ -324,4 +339,91 @@ async RequisitosPasswd()
 setTimeout(() => this.busyService.hide(overlayRef));
 }
 
+
+maskString(str: string): string {
+  
+  const numAsterisks = Math.floor(Math.random() * str.length); // Número aleatorio de asteriscos
+  const indices = [];
+
+  // Generar índices aleatorios únicos
+  while (indices.length < numAsterisks) {
+    const randomIndex = Math.floor(Math.random() * str.length);
+    if (!indices.includes(randomIndex)) {
+      indices.push(randomIndex);
+    }
+  }
+
+  // Reemplazar caracteres con asteriscos en los índices aleatorios
+  let maskedStr = str.split('');
+  indices.forEach(index => {
+    maskedStr[index] = '*';
+  });
+
+  return maskedStr.join('');
 }
+
+public async VerDatosR()
+{
+  let overlayRef: OverlayRef;
+  setTimeout(() => overlayRef = this.busyService.show());
+  try{
+
+    let respuesta2= await this._v3Client.customeprinsa_ccc_ObtenerDatosRecuperacion_columnas_get({OTP_Login:this.Login})
+    console.log(respuesta2.Entities.length)
+  if (respuesta2.Entities.length>0) 
+    {
+
+    //El usuario existe
+    console.log(respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value);
+    console.log(respuesta2.Entities[0].Columns.PhoneMobile.Value);
+
+    //Enmascarar el numero de teléfono
+    if (respuesta2.Entities[0].Columns.PhoneMobile.Value && respuesta2.Entities[0].Columns.PhoneMobile.Value.trim() !== "") 
+    {
+    const firstThreeDigits = respuesta2.Entities[0].Columns.PhoneMobile.Value.substring(0, 3);
+    this.maskedPhoneMobile = firstThreeDigits + '*'.repeat(respuesta2.Entities[0].Columns.PhoneMobile.Value.length - 3);
+    console.log("Masked Phone " + this.maskedPhoneMobile);
+    }
+    else   {
+      this.maskedPhoneMobile = null;
+    }
+    
+    
+    // Enmascarar el email
+    if (respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value && respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.trim() !== "") 
+      {
+    const atIndex = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.indexOf('@');
+    const lastDotIndex = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.lastIndexOf('.');
+    const firstThreeChars = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.substring(0, 3);
+    const domain = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.substring(lastDotIndex);
+    this.maskedEmail = firstThreeChars + '*'.repeat(atIndex - 3) + '@' + '*'.repeat(lastDotIndex - atIndex - 1) + domain;
+    console.log(this.maskedEmail);
+    }
+    else{
+      this.maskedEmail = null;
+    }
+  }
+  else{
+    this.maskedEmail=null;
+    this.maskedPhoneMobile=null;
+    this.errorLogin=true;
+  }
+  this.setFocusOnPin();
+
+} finally {
+  setTimeout(() => this.busyService.hide(overlayRef));
+}
+setTimeout(() => this.busyService.hide(overlayRef));
+
+}
+
+private setFocusOnPin(): void {
+  if (this.maskedEmail || this.maskedPhoneMobile) {
+    setTimeout(() => {
+      this.pinInput.nativeElement.focus();
+    }, 0);
+  }
+}
+
+}
+
