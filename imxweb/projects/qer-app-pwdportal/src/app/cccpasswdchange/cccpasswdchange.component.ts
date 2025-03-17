@@ -39,8 +39,8 @@ export class CccpasswdchangeComponent implements OnInit {
   
    @ViewChild('stepper') public stepper: MatStepper;
    @ViewChild('pinInput') pinInput: ElementRef;
-  
-
+   @ViewChild('pinInput') pinAccesoInput: ElementRef;
+   
   firstFormGroup = this._formBuilder.group({
     firstCtrl: ['', Validators.required],
   });
@@ -152,6 +152,7 @@ public async EnviarPin() {
     });
     setTimeout(() => this.busyService.hide(overlayRef));
     this.ConPinTemporal=true;
+    this.pinAccesoInput.nativeElement.focus();
     }
     
 }
@@ -369,20 +370,20 @@ public async VerDatosR()
   try{
 
     let respuesta2= await this._v3Client.customeprinsa_ccc_ObtenerDatosRecuperacion_columnas_get({OTP_Login:this.Login})
-    console.log(respuesta2.Entities.length)
+    //console.log(respuesta2.Entities.length)
   if (respuesta2.Entities.length>0) 
     {
 
     //El usuario existe
-    console.log(respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value);
-    console.log(respuesta2.Entities[0].Columns.PhoneMobile.Value);
+    //console.log(respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value);
+    //console.log(respuesta2.Entities[0].Columns.PhoneMobile.Value);
 
     //Enmascarar el numero de teléfono
     if (respuesta2.Entities[0].Columns.PhoneMobile.Value && respuesta2.Entities[0].Columns.PhoneMobile.Value.trim() !== "") 
     {
     const firstThreeDigits = respuesta2.Entities[0].Columns.PhoneMobile.Value.substring(0, 3);
     this.maskedPhoneMobile = firstThreeDigits + '*'.repeat(respuesta2.Entities[0].Columns.PhoneMobile.Value.length - 3);
-    console.log("Masked Phone " + this.maskedPhoneMobile);
+    //console.log("Masked Phone " + this.maskedPhoneMobile);
     }
     else   {
       this.maskedPhoneMobile = null;
@@ -397,7 +398,7 @@ public async VerDatosR()
     const firstThreeChars = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.substring(0, 3);
     const domain = respuesta2.Entities[0].Columns.CCC_SecondaryEmailAddress.Value.substring(lastDotIndex);
     this.maskedEmail = firstThreeChars + '*'.repeat(atIndex - 3) + '@' + '*'.repeat(lastDotIndex - atIndex - 1) + domain;
-    console.log(this.maskedEmail);
+    //console.log(this.maskedEmail);
     }
     else{
       this.maskedEmail = null;
@@ -417,7 +418,8 @@ setTimeout(() => this.busyService.hide(overlayRef));
 
 }
 
-private setFocusOnPin(): void {
+public setFocusOnPin(): void {
+  
   if (this.maskedEmail || this.maskedPhoneMobile) {
     setTimeout(() => {
       this.pinInput.nativeElement.focus();
@@ -426,4 +428,6 @@ private setFocusOnPin(): void {
 }
 
 }
+
+
 

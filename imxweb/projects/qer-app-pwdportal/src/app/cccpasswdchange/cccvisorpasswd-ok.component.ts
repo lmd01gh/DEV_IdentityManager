@@ -25,7 +25,7 @@
  */
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef  } from '@angular/material/dialog';
-
+import { CccpasswdchangeComponent } from './cccpasswdchange.component';
 
 
 
@@ -45,7 +45,7 @@ export class cccvisorpasswdokComponent {
   
   public _envioDatos = false;
   public _envioDatosOK= false;
-
+  private cccpasswdchangeComponent: CccpasswdchangeComponent
   constructor(private dialogRef: MatDialogRef <cccvisorpasswdokComponent>, @Inject(MAT_DIALOG_DATA) public _visorPasswordOK: visorPasswordOK,
   ) { 
     dialogRef.disableClose=true;
@@ -63,6 +63,12 @@ export class cccvisorpasswdokComponent {
       this._envioDatos=true;
       this._envioDatosOK=true;
      }  
+  }
+  onClose(): void {
+    this.dialogRef.close();
+    if (this._envioDatos && this._envioDatosOK) {
+      this.cccpasswdchangeComponent.setFocusOnPin();
+    }
   }
 
   public LdsExplanation = '#LDS#The passcode could not be created. No manager could be found for this identity. Please assign a manager to the identity or deactivate the two-person principle of passcode assignment and try again.';
