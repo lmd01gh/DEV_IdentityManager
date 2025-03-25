@@ -9,8 +9,12 @@
  
   </h1>
 
-  <eui-alert *ngIf="errorLogin" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="LimpiarErrorLogin()">
-    <span translate>Por favor, contacte nuestro centro de atención al usuario.</span>
+  <eui-alert *ngIf="errorNoDatos" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="LimpiarErrorLogin()">
+    <span translate>No tiene definidos los parámetros que permiten la renovación de su contraseña de acceso. Por favor, contacte con nuestro centro de atención al usuario o el administrador de su entidad.</span>
+</eui-alert>
+
+<eui-alert *ngIf="errorLogin" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="LimpiarErrorLogin()">
+  <span translate>Por favor, contacte nuestro centro de atención al usuario.</span>
 </eui-alert>
 
   <eui-alert *ngIf="errorCaptcha" [condensed]="true" [colored]="true" type="error"  [dismissable]="true"  (dismissed)="Anterior()">
@@ -139,7 +143,7 @@
             <div>
               <!--Solicito un pin Temporal-->
               <div *ngIf="!ConPinTemporal"> 
-                  <button mat-stroked-button class="boton" color="primary" matStepperPrevious  *ngIf="maskedEmail || maskedPhoneMobile || errorLogin" (click)="LimpiarErrorLogin()"   color="primary">Anterior</button>
+                  <button mat-stroked-button class="boton" color="primary" matStepperPrevious  *ngIf="maskedEmail || maskedPhoneMobile || errorLogin ||errorNoDatos" (click)="LimpiarErrorLogin()"   color="primary">Anterior</button>
                   <button mat-stroked-button class="boton" color="primary" (click)="EnviarPin()" *ngIf="maskedEmail || maskedPhoneMobile">Enviar Pin</button>
                 </div>
           

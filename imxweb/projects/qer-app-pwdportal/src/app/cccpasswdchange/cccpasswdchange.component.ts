@@ -73,6 +73,7 @@ export class CccpasswdchangeComponent implements OnInit {
   errorCheckPasswd=false;
   errorCaptcha=false;
   errorLogin=false;
+  errorNoDatos=false;
   maskedString: string = '';
 public maskedEmail: string;
 public maskedPhoneMobile: string;
@@ -303,12 +304,15 @@ public LimpiarErrorPaswd():void
 public LimpiarErrorLogin():void
 {
   this.errorLogin=false;
+  this.errorNoDatos=false;
   this.stepper.reset();
 }
 
 public Anterior():void {
   this.errorPascode=false;
   this.errorCaptcha=false;
+  this.errorLogin=false;
+  this.errorNoDatos=false;
 }
 
 
@@ -402,6 +406,9 @@ public async VerDatosR()
     }
     else{
       this.maskedEmail = null;
+    }
+    if (!this.maskedPhoneMobile && !this.maskedEmail) {
+      this.errorNoDatos = true;
     }
   }
   else{
